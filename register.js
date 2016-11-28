@@ -1,3 +1,4 @@
+var path = require('path')
 var Module = require('module');
 var asyncToGen = require('./index');
 
@@ -6,7 +7,9 @@ var asyncToGen = require('./index');
 // but allows for use alongside other "require extension hook" if necessary.
 var super_compile = Module.prototype._compile;
 Module.prototype._compile = function _compile(source, filename) {
-  var transformedSource = filename.indexOf('node_modules/') === -1
+  var parentDir = path.dirname(__dirname)
+  var isInstalled = filename.indexOf(parentDir) === 0 && (/node_modules$/).test(parentDir)
+  var transformedSource = true
     ? asyncToGen(source).toString()
     : source;
   super_compile.call(this, transformedSource, filename);
